@@ -19,7 +19,7 @@ git checkout $3
 
 # run a prebuild script, if present
 if [ -f .prebuild-script ]; then
-    ./prebuild-script
+    ./.prebuild-script
 fi
 
 # look for a file '.build-path' that gives a hint on where the setup.py is
