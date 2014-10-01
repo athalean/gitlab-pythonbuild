@@ -22,6 +22,11 @@ if [ -f .build-path ]; then
     cd $(cat .build-path)
 fi
 
+# run a prebuild script, if present
+if [ -f .prebuild-script ]; then
+    ./prebuild-script
+fi
+
 # call sdist or bdist on setup.py, and copy the generated eggs to the folder in $6 (from config.py)
 python setup.py "$5" --dist-dir "$6"
 

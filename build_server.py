@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Hello World!"
+    return "Please set up /build as a web hook in GitLab."
 
 
 def parse_request(data):
@@ -41,6 +41,10 @@ def parse_request(data):
 
 @app.route('/build', methods=['POST'])
 def build():
+    # check the API key
+    if request.args.get('key', '') != API_KEY:
+        return "No valid key", 403
+
     # extract data from body
     repo_url, repo_name, commit_id, branch = parse_request(request.data)
     # mode can be determined with get parameter, e.g "/build?m=bdist"
@@ -66,4 +70,4 @@ def build():
 
 if __name__ == "__main__":
     debug = getenv('FLASK_DEBUG', False)
-    app.run(debug=debug, host='0.0.0.0')
+    app.run(debug=debug)
