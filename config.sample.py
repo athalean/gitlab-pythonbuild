@@ -1,0 +1,1 @@
+DESTDIR = '/a/public/folder'
