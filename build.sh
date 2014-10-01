@@ -17,14 +17,14 @@ COMPILE_DIR=$(pwd)
 git clone $1 .
 git checkout $3
 
-# look for a file '.build-path' that gives a hint on where the setup.py is
-if [ -f .build-path ]; then
-    cd $(cat .build-path)
-fi
-
 # run a prebuild script, if present
 if [ -f .prebuild-script ]; then
     ./prebuild-script
+fi
+
+# look for a file '.build-path' that gives a hint on where the setup.py is
+if [ -f .build-path ]; then
+    cd $(cat .build-path)
 fi
 
 # call sdist or bdist on setup.py, and copy the generated eggs to the folder in $6 (from config.py)
