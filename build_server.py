@@ -63,6 +63,10 @@ def build():
     if not version_string:
         return "Ok. Nothing to build."
 
+    if path.isdir(path.join(CURDIR, 'tmp', repo_name+'_'+commit_id)):
+        app.logger.error("Second build request ignored. Build is already running.")
+        return "Still building..."
+
     app.logger.info('Starting to build '+repo_name+'...')
 
     # run the script build.sh
