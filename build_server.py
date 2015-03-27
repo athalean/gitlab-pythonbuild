@@ -5,7 +5,7 @@ from subprocess import call
 from config import *
 import re
 
-TAG_REF_RE = re.compile(r'refs/tag/v(?P<version_string>.*?)$')
+TAG_REF_RE = re.compile(r'refs/tags/v(?P<version_string>.*?)$')
 
 CURDIR = path.dirname(path.abspath(__file__))
 
