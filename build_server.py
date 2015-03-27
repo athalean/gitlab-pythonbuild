@@ -3,6 +3,9 @@ from os import getenv, path
 from json import loads as json_load
 from subprocess import call
 from config import *
+import re
+
+TAG_REF_RE = re.compile(r'refs/tag/v(?P<version_string>.*?)$')
 
 CURDIR = path.dirname(path.abspath(__file__))
 
@@ -34,9 +37,15 @@ def parse_request(data):
     except KeyError:
         return "Error: invalid commit id"
 
-    branch = data.get('ref', '').partition('refs/heads/')[2].strip() or '<unknown branch>'
+    # by convention: Tags are named 'v1.2.3.4', setup script sets version number by environment variable
+    tagref = TAG_REF_RE.match(data.get('ref', ''))
 
-    return repo_url, repo_name, commit_id, branch
+    version_string = ''
+
+    if tagref and data.get('object_kind', '') == 'tag_push':
+        version_string = tagref.group('version_string')
+
+    return repo_url, repo_name, commit_id, version_string
 
 
 @app.route('/build', methods=['POST'])
@@ -46,19 +55,19 @@ def build():
         return "No valid key", 403
 
     # extract data from body
-    repo_url, repo_name, commit_id, branch = parse_request(request.data)
+    repo_url, repo_name, commit_id, version_string = parse_request(request.data)
     # mode can be determined with get parameter, e.g "/build?m=bdist"
     mode = request.args.get('m', 'sdist')
     mode = mode if mode in ['sdist', 'bdist'] else 'sdist'
 
-    if branch != "master":
+    if not version_string:
         return "Ok. Nothing to build."
 
     app.logger.info('Starting to build '+repo_name+'...')
 
     # run the script build.sh
     return_code = call([path.join(CURDIR, 'build.sh'), repo_url,
-                        repo_name, commit_id, branch, mode, DESTDIR])
+                        repo_name, commit_id, version_string, mode, DESTDIR])
     if return_code:
         app.logger.error("Build of "+repo_name+",  failed.")
         return "Error while building", 500
