@@ -27,7 +27,9 @@ if [ -f .build-path ]; then
 fi
 
 # call sdist or bdist on setup.py, and copy the generated eggs to the folder in $6 (from config.py)
-VERSION_STRING=$4 python setup.py "$5" --dist-dir "$6"
+# replace version in script with actual version
+sed -i "s/VERSION_REPLACED_BY_SCRIPT/\"$4\"/g" setup.py
+python setup.py "$5" --dist-dir "$6"
 
 cd "$COMPILE_DIR"
 cd ..
